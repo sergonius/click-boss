@@ -8,14 +8,16 @@
   "license": "MIT",
   "private": false,
   "repository": {
-    "url": ""
+    "type": "git",
+    "url": "https://github.com/sergonius/click-boss.git"
   },
   "scripts": {
     "clean": "rimraf build/compiled/*",
     "tsc": "tsc",
     "prebuild": "run-s clean tsc",
     "build": "node build/make-bundle",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "prepublish": "npm run build"
   },
   "devDependencies": {
     "lint-staged": "^8.1.0",
