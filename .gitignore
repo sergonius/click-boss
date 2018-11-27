@@ -1,4 +1,4 @@
 node_modules
 /build/compiled
-/my-npm-package.d.ts
-/my-npm-package.min.js
+/click-boss.d.ts
+/click-boss.min.js

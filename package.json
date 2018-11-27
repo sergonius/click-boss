@@ -1,6 +1,6 @@
 {
   "name": "@sergonius/click-boss",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Handle all clicks in a single listener",
   "main": "click-boss.js",
   "types": "click-boss.d.ts",
@@ -25,7 +25,6 @@
     "rimraf": "^2.6.2",
     "rollup": "^0.67.3",
     "tslint": "^5.11.0",
-    "typescript": "^3.1.6",
-    "uglify-es": "^3.3.9"
+    "typescript": "^3.1.6"
   }
 }

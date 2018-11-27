@@ -2,7 +2,6 @@ const { promisify } = require('util');
 const fs = require('fs');
 const path = require('path');
 const rollup = require('rollup');
-const uglifyEs = require('uglify-es');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -21,12 +20,9 @@ async function build() {
     sourcemap: false
   });
 
-  let minified = uglifyEs.minify(code);
-  if (minified.error) throw minified.error;
-
   await writeFile(
-    path.join(distNpmPath, `${packageName}.min.js`),
-    minified.code
+    path.join(distNpmPath, `${packageName}.js`),
+    code
   );
   await writeFile(
     path.join(distNpmPath, `${packageName}.d.ts`),
