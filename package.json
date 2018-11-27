@@ -1,6 +1,6 @@
 {
   "name": "@sergonius/click-boss",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Handle all clicks in a single listener",
   "main": "click-boss.js",
   "types": "click-boss.d.ts",
