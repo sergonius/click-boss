@@ -1,4 +1,4 @@
 node_modules
 /build/compiled
 /click-boss.d.ts
-/click-boss.min.js
+/click-boss.js
