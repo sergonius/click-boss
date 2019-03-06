@@ -1,6 +1,6 @@
 {
 	"name": "@sergonius/typa",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Make words type themselves",
 	"main": "typa.js",
 	"types": "typa.d.ts",
