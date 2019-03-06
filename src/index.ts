@@ -1,152 +1,82 @@
-interface Typa {
-	id: number;
-	opts: {
-		strings: Array<string>;
-		speed: number;
-		delay: number;
-		loop: boolean;
-		selector: string;
-	};
-	selector: HTMLElement;
-	timeout: any; // FIXME: figure this out
-}
-class Typa {
-	constructor(opts) {
-		this.id = +new Date();
-		this.opts = opts;
-	}
+class ClickBoss {
+  public static NODE_LIMIT: number = 10;
+  public static events = new WeakMap();
+  protected static listenerAdded: boolean = false;
+  private static eventCount: number = 0;
 
-	start() {
-		const { strings, speed, delay, loop, selector } = this.opts;
+  static removeEvent(elem) {
+    if (ClickBoss.events.has(elem)) {
+      ClickBoss.events.delete(elem);
+      ClickBoss.eventCount -= 1;
 
-		this.selector = document.querySelector(selector);
+      if (ClickBoss.eventCount === 0) {
+        ClickBoss.removeListener();
+      }
 
-		if (this.selector) {
-			this.selector.innerHTML =
-				'<span id="typer"></span><span class="typed-cursor"></span>';
+      return true;
+    }
 
-			const typer = document.getElementById('typer');
-			const { strings, speed, delay, loop } = this.opts;
+    throw Error("This element does not have a handler");
+  }
 
-			this.typing(typer, strings, 0, 0, speed, delay, loop);
-		}
-	}
+  static addEvent({ elem, fn }) {
+    if (!(elem && elem.nodeType === Node.ELEMENT_NODE)) {
+      throw Error('"elem" is mandatory and must be an element node');
+    }
 
-	stop() {
-		clearTimeout(this.timeout());
-	}
+    if (!(fn && typeof fn === "function")) {
+      throw Error('"fn" is mandatory and must be a function');
+    }
 
-	typing(
-		elem: HTMLElement,
-		strings: Array<string>,
-		currentLetter,
-		currentWord,
-		speed,
-		delay,
-		loop,
-		reverse?: boolean,
-	) {
-		if (!reverse) {
-			if (strings[currentWord]) {
-				if (currentLetter < strings[currentWord].length) {
-					elem.innerHTML = strings[currentWord].substring(0, currentLetter + 1);
-					currentLetter += 1;
+    if (ClickBoss.events.has(elem)) {
+      throw Error(
+        "This element already has a handler. Remove the old one to add a new one."
+      );
+    }
 
-					this.timeout = setTimeout(() => {
-						this.typing(
-							elem,
-							strings,
-							currentLetter,
-							currentWord,
-							speed,
-							delay,
-							loop,
-						);
-					}, speed);
-				} else {
-					this.timeout = setTimeout(() => {
-						this.typing(
-							elem,
-							strings,
-							currentLetter,
-							currentWord,
-							speed,
-							delay,
-							loop,
-							true,
-						);
-					}, delay);
-				}
-			} else {
-				currentWord = 0;
+    if (!ClickBoss.listenerAdded) {
+      ClickBoss.addListener();
+    }
 
-				this.typing(
-					elem,
-					strings,
-					currentLetter,
-					currentWord,
-					speed,
-					delay,
-					loop,
-				);
-			}
-		} else {
-			if (currentLetter > 0) {
-				if (loop) {
-					elem.innerHTML = strings[currentWord].substring(0, currentLetter - 1);
-					currentLetter -= 1;
+    ClickBoss.events.set(elem, fn);
+    ClickBoss.eventCount += 1;
 
-					this.timeout = setTimeout(() => {
-						this.typing(
-							elem,
-							strings,
-							currentLetter,
-							currentWord,
-							speed,
-							delay,
-							loop,
-							reverse,
-						);
-					}, speed);
-				} else {
-					if (strings.length - 1 !== currentWord) {
-						elem.innerHTML = strings[currentWord].substring(
-							0,
-							currentLetter - 1,
-						);
-						currentLetter -= 1;
+    return true;
+  }
 
-						this.timeout = setTimeout(() => {
-							this.typing(
-								elem,
-								strings,
-								currentLetter,
-								currentWord,
-								speed,
-								delay,
-								loop,
-								reverse,
-							);
-						}, speed);
-					}
-				}
-			} else {
-				currentWord += 1;
+  private static addListener() {
+    document.documentElement.addEventListener("click", listenerFn);
+    ClickBoss.listenerAdded = true;
+  }
 
-				this.timeout = setTimeout(() => {
-					this.typing(
-						elem,
-						strings,
-						currentLetter,
-						currentWord,
-						speed,
-						delay,
-						loop,
-					);
-				}, speed);
-			}
-		}
-	}
+  private static removeListener() {
+    document.documentElement.removeEventListener("click", listenerFn);
+    ClickBoss.listenerAdded = false;
+  }
 }
 
-export default Typa;
+function getTargetElem(elem, nodeLimit: number = ClickBoss.NODE_LIMIT) {
+  if (nodeLimit === 0) {
+    return false;
+  }
+
+  if (ClickBoss.events.has(elem)) {
+    return elem;
+  }
+
+  if (elem.parentNode) {
+    return getTargetElem(elem.parentNode, nodeLimit - 1);
+  }
+
+  return false;
+}
+
+function listenerFn(event) {
+  const targetElem = getTargetElem(event.target);
+
+  if (targetElem) {
+    ClickBoss.events.get(targetElem).bind(targetElem)(event);
+  }
+}
+
+export default ClickBoss;
