@@ -2,3 +2,4 @@ node_modules
 /build/compiled
 /click-boss.d.ts
 /click-boss.js
+.history
